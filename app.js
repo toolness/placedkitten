@@ -9,6 +9,7 @@ var PORT = process.env.PORT || 3000;
 var DEBUG = 'DEBUG' in process.env;
 var INTEGER_RE = /^\d+$/;
 var MAX_DIMENSION = 1000;
+var KEEPALIVE_INTERVAL = 30000;
 var COPY_HEADERS = [
   'content-type',
   'content-length',
@@ -84,9 +85,12 @@ server.listen(PORT, function() {
 });
 
 wss.on('connection', function(ws) {
+  var keepalive = setInterval(function() {
+    ws.send('keepalive');
+  }, KEEPALIVE_INTERVAL);
   channels.add(ws.upgradeReq.url, ws);
   ws.on('close', function() {
+    clearInterval(keepalive);
     channels.remove(ws.upgradeReq.url, ws);
-    console.log('stop connexion');
   });
 });

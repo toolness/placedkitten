@@ -42,6 +42,10 @@ socket.onopen = function(event) {
 };
 
 socket.onmessage = function(event) {
+  if (event.data == 'keepalive') {
+    if (typeof(console) != 'undefined') console.log('keepalive received');
+    return;
+  }
   var headers = JSON.parse(event.data);
   log('info', JSON.stringify(headers, null, 2));
 };
