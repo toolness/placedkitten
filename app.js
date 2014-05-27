@@ -13,9 +13,7 @@ var KEEPALIVE_INTERVAL = 30000;
 var COPY_HEADERS = [
   'content-type',
   'content-length',
-  'access-control-allow-origin',
-  'cache-control',
-  'expires'
+  'access-control-allow-origin'
 ];
 
 var app = express();
