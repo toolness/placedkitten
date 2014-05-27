@@ -60,7 +60,10 @@ if (DEBUG)
 
 app.get('/:width/:height', function(req, res, next) {
   var url = 'http://placekitten.com/' + req.width + '/' + req.height;
-  channels.broadcast(req.url, JSON.stringify(req.headers));
+  channels.broadcast(
+    req.url, 
+    JSON.stringify(_.pick(req, 'method', 'url', 'httpVersion', 'headers'))
+  );
   http.get(url, function(kittenRes) {
     if (kittenRes.statusCode != 200)
       return res.send(502);

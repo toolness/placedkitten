@@ -29,6 +29,14 @@ function log(className, msg) {
   log.appendChild(pre);
 }
 
+function logRequest(req) {
+  var lines = [req.method + ' ' + req.url + ' HTTP/' + req.httpVersion];
+  [].push.apply(lines, Object.keys(req.headers).map(function(name) {
+    return name + ': ' + req.headers[name];
+  }));
+  log('info', lines.join('\n'));
+}
+
 socket.onclose = function(event) {
   // This short delay ensures this message doesn't erroneously get
   // displayed b/c the page is about to unload/reload.
@@ -46,7 +54,6 @@ socket.onmessage = function(event) {
     if (typeof(console) != 'undefined') console.log('keepalive received');
     return;
   }
-  var headers = JSON.parse(event.data);
-  log('info', JSON.stringify(headers, null, 2));
+  logRequest(JSON.parse(event.data));
 };
 </script>
