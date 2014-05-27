@@ -8,7 +8,6 @@ var WebSocketServer = require('ws').Server;
 var PORT = process.env.PORT || 3000;
 var DEBUG = 'DEBUG' in process.env;
 var INTEGER_RE = /^\d+$/;
-var TRAILING_SLASH_RE = /\/$/;
 var MAX_DIMENSION = 1000;
 var KEEPALIVE_INTERVAL = 30000;
 var COPY_HEADERS = [
@@ -51,6 +50,10 @@ function setDimension(name) {
   }
 }
 
+function channelNameFromRequest(req) {
+  return '/' + req.width + '/' + req.height;
+}
+
 mustache.root = __dirname + '/templates';
 
 app.param('width', setDimension('width'));
@@ -60,10 +63,9 @@ if (DEBUG)
   app.use(function(req, res, next) { mustache.clearCache(); next(); });
 
 app.get('/:width/:height', function(req, res, next) {
-  if (TRAILING_SLASH_RE.test(req.url)) return next('route');
   var url = 'http://placekitten.com/' + req.width + '/' + req.height;
   channels.broadcast(
-    req.url, 
+    channelNameFromRequest(req),
     JSON.stringify(_.pick(req, 'method', 'url', 'httpVersion', 'headers'))
   );
   http.get(url, function(kittenRes) {
@@ -79,7 +81,7 @@ app.get('/:width/:height', function(req, res, next) {
 app.get('/:width/:height/log', function(req, res, next) {
   res.writeHead(200, {'content-type': 'text/html'});
   mustache.compileAndRender('log.html', {
-    path: '/' + req.width + '/' + req.height
+    path: channelNameFromRequest(req)
   }).pipe(res);
 });
 
