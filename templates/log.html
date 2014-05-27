@@ -19,7 +19,8 @@ pre.error {
 </p>
 <div id="log"></div>
 <script>
-var socket = new WebSocket('ws://' + window.location.host + '{{ path }}');
+var socket = new WebSocket('ws://' + window.location.host +
+                           '{{ channelName }}');
 
 function log(className, msg) {
   var pre = document.createElement('pre');
