@@ -1,0 +1,18 @@
+{
+  "name": "placedkitten",
+  "version": "0.0.1",
+  "description": "Learn how the internet works by reading request logs to placekitten images.",
+  "main": "app.js",
+  "dependencies": {
+    "express": "~4.3.1",
+    "mu2": "~0.5.20",
+    "underscore": "~1.6.0",
+    "ws": "~0.4.31"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
