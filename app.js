@@ -8,6 +8,7 @@ var WebSocketServer = require('ws').Server;
 var PORT = process.env.PORT || 3000;
 var DEBUG = 'DEBUG' in process.env;
 var INTEGER_RE = /^\d+$/;
+var TRAILING_SLASH_RE = /\/$/;
 var MAX_DIMENSION = 1000;
 var KEEPALIVE_INTERVAL = 30000;
 var COPY_HEADERS = [
@@ -59,6 +60,7 @@ if (DEBUG)
   app.use(function(req, res, next) { mustache.clearCache(); next(); });
 
 app.get('/:width/:height', function(req, res, next) {
+  if (TRAILING_SLASH_RE.test(req.url)) return next('route');
   var url = 'http://placekitten.com/' + req.width + '/' + req.height;
   channels.broadcast(
     req.url, 
