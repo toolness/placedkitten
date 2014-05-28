@@ -6,25 +6,29 @@ pre.error {
   color: red;
 }
 </style>
-<title>Placedkitten</title>
+<title>Placedkitten at {{ path }}</title>
 <div class="container">
   <h1>Log for <code>{{ path }}</code></h1>
-  <p>
-    When a client accesses the placekitten at
-    <a href="{{ path }}">{{ path }}</a>, information about the request
-    will be logged here.
-  </p>
+  <div class="media">
+    <a class="pull-left" href="{{ path }}">
+      <img src="{{ path }}">
+    </a>
+    <div class="media-body">
+      When a client accesses the placekitten at
+      <a href="{{ path }}"><span class="origin"></span>{{ path }}</a>,
+      information about the request will be logged here.
+    </div>
+  </div>
+  <br>
   <div id="log"></div>
 </div>
+<script src="/vendor/jquery.js"></script>
 <script>
+var origin = window.location.protocol + '//' + window.location.host;
 var socket = new WebSocket('ws://' + window.location.host + '{{ path }}');
 
 function log(className, msg) {
-  var pre = document.createElement('pre');
-  var log = document.getElementById('log');
-  pre.setAttribute('class', className);
-  pre.appendChild(document.createTextNode(msg));
-  log.appendChild(pre);
+  $('<pre></pre>').addClass(className).text(msg).appendTo('#log');
 }
 
 function logRequest(req) {
@@ -54,4 +58,6 @@ socket.onmessage = function(event) {
   }
   logRequest(JSON.parse(event.data));
 };
+
+$('span.origin').text(origin);
 </script>
