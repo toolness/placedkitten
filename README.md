@@ -7,5 +7,14 @@ additional information about every incoming request to a particular
 `/:width/:height` image via a WebSocket-based logging interface at
 `/:width/:height/log`.
 
+## Quick Start
+
+```
+npm install
+DEBUG= node app.js
+```
+
+Then visit http://localhost:3000/.
+
   [URL Demystifier]: https://github.com/toolness/url-demystifier
   [placekitten.com]: http://placekitten.com/
