@@ -2,8 +2,26 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="/vendor/makerstrap.complete.min.css">
 <style>
-pre.error {
+#log .error {
   color: red;
+}
+
+.request {
+  border: 1px solid #CCC;
+  margin: 0 0 10px;
+}
+
+.request .request-desc {
+  padding: 5px;
+}
+
+.request .request-log {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background-color: #F5F5F5;
+  padding: 5px;
 }
 </style>
 <title>Placedkitten at {{ path }}</title>
@@ -28,29 +46,39 @@ var origin = window.location.protocol + '//' + window.location.host;
 var socket = new WebSocket('ws://' + window.location.host +
                            '{{ channelName }}');
 
-function log(className, msg) {
-  $('<pre></pre>').addClass(className).text(msg).appendTo('#log')
-    .hide().fadeIn();
+function log(msg, className) {
+  if (typeof(msg) == 'string')
+    msg = $('<p></p>').text(msg);
+  if (className) msg.addClass(className);
+  msg.appendTo('#log').hide().fadeIn();
 }
 
 function logRequest(req) {
+  var rdiv = $('<div class="request"></div>');
+  var rdesc = $('<div class="request-desc"></div>').appendTo(rdiv);
+  var rlog = $('<div class="request-log"></div>').appendTo(rdiv);
+
   var lines = [req.method + ' ' + req.url + ' HTTP/' + req.httpVersion];
+
   [].push.apply(lines, Object.keys(req.headers).map(function(name) {
     return name + ': ' + req.headers[name];
   }));
-  log('info', lines.join('\n'));
+  rlog.text(lines.join('\n'));
+  rdesc.text("Incoming request from " + req.remoteAddress);
+
+  log(rdiv);
 }
 
 socket.onclose = function(event) {
   // This short delay ensures this message doesn't erroneously get
   // displayed b/c the page is about to unload/reload.
   setTimeout(function() {
-    log('error', 'WebSocket closed. Please reload the page to reopen it.');
+    log('WebSocket closed. Please reload the page to reopen it.', 'error');
   }, 100);
 };
 
 socket.onopen = function(event) {
-  log('info', 'WebSocket to log stream opened.');
+  log('WebSocket to log stream opened.');
 };
 
 socket.onmessage = function(event) {
