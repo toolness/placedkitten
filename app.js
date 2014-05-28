@@ -8,6 +8,7 @@ var WebSocketServer = require('ws').Server;
 var PORT = process.env.PORT || 3000;
 var DEBUG = 'DEBUG' in process.env;
 var INTEGER_RE = /^\d+$/;
+var MIN_RANDOM_DIMENSION = 100;
 var MAX_DIMENSION = 500;
 var KEEPALIVE_INTERVAL = 30000;
 var OMIT_HEADERS = lowercased(commaSeparated(process.env.OMIT_HEADERS));
@@ -75,8 +76,8 @@ function channelNameFromRequest(req) {
 }
 
 function makeRandomPath() {
-  return '/' + _.random(1, MAX_DIMENSION) + '/' +
-               _.random(1, MAX_DIMENSION) + '/log';
+  return '/' + _.random(MIN_RANDOM_DIMENSION, MAX_DIMENSION) + '/' +
+               _.random(MIN_RANDOM_DIMENSION, MAX_DIMENSION) + '/log';
 }
 
 mustache.root = __dirname + '/templates';
