@@ -61,7 +61,7 @@ function setDimension(name) {
 }
 
 function channelNameFromRequest(req) {
-  return '/' + req.width + '/' + req.height;
+  return '/' + req.width + '/' + req.height + '/channel';
 }
 
 mustache.root = __dirname + '/templates';
@@ -72,7 +72,12 @@ app.param('height', setDimension('height'));
 if (DEBUG)
   app.use(function(req, res, next) { mustache.clearCache(); next(); });
 
-app.get('/:width/:height', function(req, res, next) {
+app.get('/:width/:height', function setCookie(req, res, next) {
+  if (req.headers.dnt == '1') return next();
+  var match = (req.headers.cookie || '').match(/requestCount=([0-9]+)/);
+  res.cookie('requestCount', match ? parseInt(match[1]) + 1 : 1);
+  next();
+}, function(req, res, next) {
   var url = 'http://placekitten.com/' + req.width + '/' + req.height;
   var info = _.extend(_.pick(req, 'method', 'url', 'httpVersion'), {
     headers: _.omit(req.headers, OMIT_HEADERS)
@@ -91,7 +96,8 @@ app.get('/:width/:height', function(req, res, next) {
 app.get('/:width/:height/log', function(req, res, next) {
   res.writeHead(200, {'content-type': 'text/html'});
   mustache.compileAndRender('log.html', {
-    path: channelNameFromRequest(req)
+    path: '/' + req.width + '/' + req.height,
+    channelName: channelNameFromRequest(req)
   }).pipe(res);
 });
 

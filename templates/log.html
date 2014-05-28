@@ -25,7 +25,8 @@ pre.error {
 <script src="/vendor/jquery.js"></script>
 <script>
 var origin = window.location.protocol + '//' + window.location.host;
-var socket = new WebSocket('ws://' + window.location.host + '{{ path }}');
+var socket = new WebSocket('ws://' + window.location.host +
+                           '{{ channelName }}');
 
 function log(className, msg) {
   $('<pre></pre>').addClass(className).text(msg).appendTo('#log')
