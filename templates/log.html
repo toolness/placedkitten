@@ -7,6 +7,11 @@ html:not(.show-advanced) .advanced {
   display: none;
 }
 
+h1 a {
+  /* Alas, this isn't very discoverable. */
+  color: inherit;
+}
+
 img.placekitten {
   min-width: 100px;
   max-height: 1000px;
@@ -44,7 +49,7 @@ img.placekitten {
 </style>
 <title>Placedkitten Log for {{ path }}</title>
 <div class="container">
-  <h1>Placedkitten Log for <code>{{ path }}</code></h1>
+  <h1><a href="/" target="_self">Placedkitten</a> Log for <code>{{ path }}</code></h1>
   <div class="media">
     <a class="pull-left" href="{{ path }}">
       <img src="{{ path }}" class="placekitten">
