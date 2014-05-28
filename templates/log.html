@@ -2,8 +2,16 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="/vendor/makerstrap.complete.min.css">
 <style>
+html:not(.show-advanced) .advanced {
+  display: none;
+}
+
 #log .error {
   color: red;
+}
+
+#log .advanced {
+  color: gray;
 }
 
 .request {
@@ -40,6 +48,12 @@
         IP-based geolocation is courtesy of 
         <a href="http://freegeoip.net">freegeoip.net</a>.
       </p>
+      <div class="checkbox">
+        <label>
+          <input name="show-advanced" type="checkbox">
+          Show advanced technical details
+        </label>
+      </div>
     </div>
   </div>
   <br>
@@ -47,6 +61,8 @@
 </div>
 <script src="/vendor/jquery.js"></script>
 <script>
+var NON_ADVANCED_HEADERS = ['referer', 'user-agent', 'cookie'];
+
 var origin = window.location.protocol + '//' + window.location.host;
 var wsProtocol = window.location.protocol == 'http:' ? 'ws:' : 'wss:';
 var socket = new WebSocket(wsProtocol + '//' + window.location.host +
@@ -85,12 +101,15 @@ function logRequest(req) {
   var rdesc = $('<div class="request-desc"></div>').appendTo(rdiv);
   var rlog = $('<div class="request-log"></div>').appendTo(rdiv);
 
-  var lines = [req.method + ' ' + req.url + ' HTTP/' + req.httpVersion];
+  rlog.text(req.method + ' ' + req.url + ' HTTP/' + req.httpVersion);
 
-  [].push.apply(lines, Object.keys(req.headers).map(function(name) {
-    return capitalizeHeader(name) + ': ' + req.headers[name];
-  }));
-  rlog.text(lines.join('\n'));
+  Object.keys(req.headers).forEach(function(name) {
+    var row = $('<div></div>').appendTo(rlog);
+    row.text(capitalizeHeader(name) + ': ' + req.headers[name]);
+    if (NON_ADVANCED_HEADERS.indexOf(name) == -1)
+      row.addClass('advanced');
+  });
+
   rdesc.text("Incoming request from " + req.remoteAddress);
 
   log(rdiv);
@@ -125,4 +144,8 @@ socket.onmessage = function(event) {
 };
 
 $('span.origin').text(origin);
+
+$("input[name=show-advanced]").change(function() {
+  $('html').toggleClass('show-advanced', this.checked);
+}).trigger('change');
 </script>
