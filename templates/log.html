@@ -6,6 +6,15 @@ html:not(.show-advanced) .advanced {
   display: none;
 }
 
+img.placekitten {
+  min-width: 50px;
+  max-height: 1000px;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+}
+
 #log .error {
   color: red;
 }
@@ -37,7 +46,7 @@ html:not(.show-advanced) .advanced {
   <h1>Log for <code>{{ path }}</code></h1>
   <div class="media">
     <a class="pull-left" href="{{ path }}">
-      <img src="{{ path }}">
+      <img src="{{ path }}" class="placekitten">
     </a>
     <div class="media-body">
       <p>When a client accesses the image at
