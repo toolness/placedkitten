@@ -62,7 +62,7 @@ function log(msg, className) {
 
 function geolocate(ip, cb) {
   if (ip in geolocationCache) return cb(geolocationCache[ip]);
-  $.getJSON('http://freegeoip.net/json/' + ip, function(data) {
+  $.getJSON('//freegeoip.net/json/' + ip, function(data) {
     if (data.country_name != 'Reserved') {
       var nameParts = [data.country_name];
       if (data.region_name) nameParts.unshift(data.region_name);
