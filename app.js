@@ -85,6 +85,8 @@ app.get('/:width/:height/log', function(req, res, next) {
   }).pipe(res);
 });
 
+app.use(express.static(__dirname + '/static'));
+
 server.listen(PORT, function() {
   console.log('listening on port ' + PORT);
 });

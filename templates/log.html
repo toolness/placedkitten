@@ -1,23 +1,21 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+<link rel="stylesheet" href="/vendor/makerstrap.complete.min.css">
 <style>
-pre {
-  border-top: 1px dotted gray;
-  padding-top: 4px;
-}
-
 pre.error {
   color: red;
 }
 </style>
 <title>Placedkitten</title>
-<h1>Log for <code>{{ path }}</code></h1>
-<p>
-  When a client accesses the placekitten at
-  <a href="{{ path }}">{{ path }}</a>, information about the request
-  will be logged here.
-</p>
-<div id="log"></div>
+<div class="container">
+  <h1>Log for <code>{{ path }}</code></h1>
+  <p>
+    When a client accesses the placekitten at
+    <a href="{{ path }}">{{ path }}</a>, information about the request
+    will be logged here.
+  </p>
+  <div id="log"></div>
+</div>
 <script>
 var socket = new WebSocket('ws://' + window.location.host + '{{ path }}');
 
