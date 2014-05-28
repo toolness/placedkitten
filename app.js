@@ -8,7 +8,7 @@ var WebSocketServer = require('ws').Server;
 var PORT = process.env.PORT || 3000;
 var DEBUG = 'DEBUG' in process.env;
 var INTEGER_RE = /^\d+$/;
-var MAX_DIMENSION = 1000;
+var MAX_DIMENSION = 500;
 var KEEPALIVE_INTERVAL = 30000;
 var OMIT_HEADERS = lowercased(commaSeparated(process.env.OMIT_HEADERS));
 var IP_HEADER = (process.env.IP_HEADER || '').toLowerCase();
@@ -74,6 +74,11 @@ function channelNameFromRequest(req) {
   return '/' + req.width + '/' + req.height + '/channel';
 }
 
+function makeRandomPath() {
+  return '/' + _.random(1, MAX_DIMENSION) + '/' +
+               _.random(1, MAX_DIMENSION) + '/log';
+}
+
 mustache.root = __dirname + '/templates';
 
 app.param('width', setDimension('width'));
@@ -81,6 +86,13 @@ app.param('height', setDimension('height'));
 
 if (DEBUG)
   app.use(function(req, res, next) { mustache.clearCache(); next(); });
+
+app.get('/', function(req, res) {
+  res.writeHead(200, {'content-type': 'text/html'});
+  mustache.compileAndRender('index.html', {
+    randomPath: makeRandomPath()
+  }).pipe(res);  
+});
 
 app.get('/:width/:height', function setCookie(req, res, next) {
   if (req.headers.dnt == '1') return next();
@@ -108,6 +120,7 @@ app.get('/:width/:height/log', function(req, res, next) {
   res.writeHead(200, {'content-type': 'text/html'});
   mustache.compileAndRender('log.html', {
     path: '/' + req.width + '/' + req.height,
+    randomPath: makeRandomPath(),
     channelName: channelNameFromRequest(req)
   }).pipe(res);
 });

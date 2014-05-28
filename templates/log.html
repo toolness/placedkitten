@@ -42,9 +42,9 @@ img.placekitten {
   padding: 5px;
 }
 </style>
-<title>Placedkitten at {{ path }}</title>
+<title>Placedkitten Log for {{ path }}</title>
 <div class="container">
-  <h1>Log for <code>{{ path }}</code></h1>
+  <h1>Placedkitten Log for <code>{{ path }}</code></h1>
   <div class="media">
     <a class="pull-left" href="{{ path }}">
       <img src="{{ path }}" class="placekitten">
@@ -56,9 +56,18 @@ img.placekitten {
       <p>
         Things to try in a separate browser tab:
         <ul>
+          <li>Open the image in a variety of different browsers and
+            see how the <a href="http://en.wikipedia.org/wiki/User_agent">User-Agent</a>
+            changes.
           <li>Embed the image in a Web page using a tool like
-            <a href="http://thimble.webmaker.org/">Thimble</a>.
+            <a href="http://thimble.webmaker.org/">Thimble</a> and
+            see how the <a href="http://en.wikipedia.org/wiki/HTTP_referer">Referer</a>
+            changes.
+          <li>Give the URL to friends in different places and see how the
+            <a href="http://stackoverflow.com/a/1996129">IP geolocation</a>
+            information changes.
           <li>Paste the URL into a Facebook comment.
+          <li>Embed the URL as an image in an email.
           <li>Give the URL to the
             <a href="http://url-demystifier.toolness.org/">URL
               Demystifier</a>.
@@ -68,6 +77,11 @@ img.placekitten {
         <a href="http://placekitten.com">placekitten.com</a>.
         IP-based geolocation is courtesy of 
         <a href="http://freegeoip.net">freegeoip.net</a>.
+      </p>
+      <p>
+        If this log is already being used by someone else (or if you
+        just want to see a different kitten) you can
+        try <a href="{{ randomPath }}" target="_self">this one</a>.
       </p>
       <div class="checkbox">
         <label>
@@ -148,12 +162,13 @@ socket.onclose = function(event) {
   // This short delay ensures this message doesn't erroneously get
   // displayed b/c the page is about to unload/reload.
   setTimeout(function() {
-    log('WebSocket closed. Please reload the page to reopen it.', 'error');
+    log('Connection to server closed. Please reload the page to ' +
+        're-establish the connection.', 'error');
   }, 100);
 };
 
 socket.onopen = function(event) {
-  log('WebSocket to log stream opened.');
+  log('Connection to server established.');
 };
 
 socket.onmessage = function(event) {
