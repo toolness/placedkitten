@@ -10,7 +10,8 @@ var DEBUG = 'DEBUG' in process.env;
 var INTEGER_RE = /^\d+$/;
 var MAX_DIMENSION = 1000;
 var KEEPALIVE_INTERVAL = 30000;
-var COPY_HEADERS = [
+var OMIT_HEADERS = lowercased(commaSeparated(process.env.OMIT_HEADERS));
+var COPY_PK_HEADERS = [
   'content-type',
   'content-length',
   'access-control-allow-origin'
@@ -40,6 +41,15 @@ var channels = {
   }
 };
 
+function lowercased(list) {
+  return list.map(function(item) { return item.toLowerCase(); });
+}
+
+function commaSeparated(str) {
+  str = str || '';
+  return str.split(',').map(function(item) { return item.trim(); });
+}
+
 function setDimension(name) {
   return function(req, res, next, id) {
     if (!INTEGER_RE.test(id)) return next('route');
@@ -64,14 +74,14 @@ if (DEBUG)
 
 app.get('/:width/:height', function(req, res, next) {
   var url = 'http://placekitten.com/' + req.width + '/' + req.height;
-  channels.broadcast(
-    channelNameFromRequest(req),
-    JSON.stringify(_.pick(req, 'method', 'url', 'httpVersion', 'headers'))
-  );
+  var info = _.extend(_.pick(req, 'method', 'url', 'httpVersion'), {
+    headers: _.omit(req.headers, OMIT_HEADERS)
+  });
+  channels.broadcast(channelNameFromRequest(req), JSON.stringify(info));
   http.get(url, function(kittenRes) {
     if (kittenRes.statusCode != 200)
       return res.send(502);
-    res.writeHead(200, _.pick(kittenRes.headers, COPY_HEADERS));
+    res.writeHead(200, _.pick(kittenRes.headers, COPY_PK_HEADERS));
     kittenRes.pipe(res);
   }).on('error', function(e) {
     return res.send(502);
