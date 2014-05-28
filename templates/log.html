@@ -32,9 +32,14 @@
       <img src="{{ path }}">
     </a>
     <div class="media-body">
-      When a client accesses the placekitten at
+      <p>When a client accesses the image at
       <a href="{{ path }}"><span class="origin"></span>{{ path }}</a>,
-      information about the request will be logged here.
+      information about the request will be logged here.</p>
+      <p>The image is courtesy of
+        <a href="http://placekitten.com">placekitten.com</a>.
+        IP-based geolocation is courtesy of 
+        <a href="http://freegeoip.net">freegeoip.net</a>.
+      </p>
     </div>
   </div>
   <br>
@@ -45,12 +50,27 @@
 var origin = window.location.protocol + '//' + window.location.host;
 var socket = new WebSocket('ws://' + window.location.host +
                            '{{ channelName }}');
+var geolocationCache = {};
 
 function log(msg, className) {
   if (typeof(msg) == 'string')
     msg = $('<p></p>').text(msg);
   if (className) msg.addClass(className);
   msg.appendTo('#log').hide().fadeIn();
+}
+
+function geolocate(ip, cb) {
+  if (ip in geolocationCache) return cb(geolocationCache[ip]);
+  $.getJSON('http://freegeoip.net/json/' + ip, function(data) {
+    if (data.country_name != 'Reserved') {
+      var nameParts = [data.country_name];
+      if (data.region_name) nameParts.unshift(data.region_name);
+      if (data.city) nameParts.unshift(data.city);
+      data.full_name = nameParts.join(', ');
+    }
+    geolocationCache[ip] = data;
+    cb(data);
+  });
 }
 
 function logRequest(req) {
@@ -67,6 +87,14 @@ function logRequest(req) {
   rdesc.text("Incoming request from " + req.remoteAddress);
 
   log(rdiv);
+
+  geolocate(req.remoteAddress, function(info) {
+    if (!info.full_name) return;
+    rdesc.append([
+      document.createTextNode(' '),
+      $('<span class="text-muted"></span>').text('(' + info.full_name + ')')
+    ]);
+  });
 }
 
 socket.onclose = function(event) {
