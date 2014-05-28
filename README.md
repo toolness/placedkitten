@@ -29,6 +29,13 @@ string), the boolean is true; otherwise, it's false.
   this should be any headers added by a reverse proxy, such as
   `X-Forwarded-Port`.
 
+* `IP_HEADER` is the name of the HTTP header that contains a
+  comma-separated list of IP addresses from which the request originated.
+  This is useful for reverse proxies like Heroku, which uses the
+  `X-Forwarded-For` header. The last IP address in this header's value
+  will be used as the originating IP of the request client; otherwise,
+  the actual remote address of the client connection will be used.
+
 ## Limitations
 
 The server process is not [stateless][], so it can't easily scale.

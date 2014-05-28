@@ -11,6 +11,7 @@ var INTEGER_RE = /^\d+$/;
 var MAX_DIMENSION = 1000;
 var KEEPALIVE_INTERVAL = 30000;
 var OMIT_HEADERS = lowercased(commaSeparated(process.env.OMIT_HEADERS));
+var IP_HEADER = (process.env.IP_HEADER || '').toLowerCase();
 var COPY_PK_HEADERS = [
   'content-type',
   'content-length',
@@ -60,6 +61,15 @@ function setDimension(name) {
   }
 }
 
+function getRemoteAddress(req) {
+  var addr;
+  if (IP_HEADER)
+    // If there are multiple IP addresses listed, assume the
+    // last one is the most trusted: http://stackoverflow.com/a/18517550
+    addr = commaSeparated(req.headers[IP_HEADER]).slice(-1)[0];
+  return addr || req.connection.remoteAddress;
+}
+
 function channelNameFromRequest(req) {
   return '/' + req.width + '/' + req.height + '/channel';
 }
@@ -80,6 +90,7 @@ app.get('/:width/:height', function setCookie(req, res, next) {
 }, function(req, res, next) {
   var url = 'http://placekitten.com/' + req.width + '/' + req.height;
   var info = _.extend(_.pick(req, 'method', 'url', 'httpVersion'), {
+    remoteAddress: getRemoteAddress(req),
     headers: _.omit(req.headers, OMIT_HEADERS)
   });
   channels.broadcast(channelNameFromRequest(req), JSON.stringify(info));
