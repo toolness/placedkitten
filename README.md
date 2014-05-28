@@ -29,7 +29,12 @@ string), the boolean is true; otherwise, it's false.
   this should be any headers added by a reverse proxy, such as
   `X-Forwarded-Port`.
 
+## Limitations
+
+The server process is not [stateless][], so it can't easily scale.
+
 <!-- Links -->
 
   [URL Demystifier]: https://github.com/toolness/url-demystifier
   [placekitten.com]: http://placekitten.com/
+  [stateless]: http://12factor.net/processes
