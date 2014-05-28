@@ -74,6 +74,12 @@ function geolocate(ip, cb) {
   });
 }
 
+function capitalizeHeader(header) {
+  return header.split('-').map(function(name) {
+    return name.slice(0, 1).toUpperCase() + name.slice(1);
+  }).join('-');
+}
+
 function logRequest(req) {
   var rdiv = $('<div class="request"></div>');
   var rdesc = $('<div class="request-desc"></div>').appendTo(rdiv);
@@ -82,7 +88,7 @@ function logRequest(req) {
   var lines = [req.method + ' ' + req.url + ' HTTP/' + req.httpVersion];
 
   [].push.apply(lines, Object.keys(req.headers).map(function(name) {
-    return name + ': ' + req.headers[name];
+    return capitalizeHeader(name) + ': ' + req.headers[name];
   }));
   rlog.text(lines.join('\n'));
   rdesc.text("Incoming request from " + req.remoteAddress);
