@@ -48,7 +48,8 @@
 <script src="/vendor/jquery.js"></script>
 <script>
 var origin = window.location.protocol + '//' + window.location.host;
-var socket = new WebSocket('ws://' + window.location.host +
+var wsProtocol = window.location.protocol == 'http:' ? 'ws:' : 'wss:';
+var socket = new WebSocket(wsProtocol + '//' + window.location.host +
                            '{{ channelName }}');
 var geolocationCache = {};
 
