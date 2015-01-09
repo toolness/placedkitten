@@ -101,20 +101,25 @@ app.get('/:width/:height', function setCookie(req, res, next) {
   res.cookie('requestCount', match ? parseInt(match[1]) + 1 : 1);
   next();
 }, function(req, res, next) {
-  var url = 'http://placekitten.com/' + req.width + '/' + req.height;
   var info = _.extend(_.pick(req, 'method', 'url', 'httpVersion'), {
     remoteAddress: getRemoteAddress(req),
     headers: _.omit(req.headers, OMIT_HEADERS)
   });
-  channels.broadcast(channelNameFromRequest(req), JSON.stringify(info));
-  http.get(url, function(kittenRes) {
-    if (kittenRes.statusCode != 200)
+  var proxy = function(url, fallbackUrl) {
+    http.get(url, function(proxyRes) {
+      if (proxyRes.statusCode != 200)
+        return res.send(502);
+      if (proxyRes.headers['content-length'] == '0' && fallbackUrl)
+        return proxy(fallbackUrl);
+      res.writeHead(200, _.pick(proxyRes.headers, COPY_PK_HEADERS));
+      proxyRes.pipe(res);
+    }).on('error', function(e) {
       return res.send(502);
-    res.writeHead(200, _.pick(kittenRes.headers, COPY_PK_HEADERS));
-    kittenRes.pipe(res);
-  }).on('error', function(e) {
-    return res.send(502);
-  });
+    });
+  };
+  proxy('http://placekitten.com/' + req.width + '/' + req.height,
+        'http://placehold.it/' + req.width + 'x' + req.height);
+  channels.broadcast(channelNameFromRequest(req), JSON.stringify(info));
 });
 
 app.get('/:width/:height/log', function(req, res, next) {
